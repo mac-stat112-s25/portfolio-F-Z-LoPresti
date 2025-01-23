@@ -9,7 +9,7 @@ book:
   reader-mode: true
   page-navigation: true
   back-to-top-navigation: true
-  bread-crumbs: true
+  #bread-crumbs: true
   
   
   sidebar:
