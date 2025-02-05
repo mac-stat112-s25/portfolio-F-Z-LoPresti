@@ -5,9 +5,8 @@ title: "Bivariate Viz"
 Use this file for practice with the **bivariate viz** in-class activity.  Refer to the class website for details.
 
 # Import data
-```{r}
 survey <- read.csv("https://ajohns24.github.io/data/112/about_us_2024.csv") 
-```
+
 
 # How many students have now filled out the survey?
 
@@ -17,13 +16,11 @@ head(survey)
 nrow(survey) 
 
 # What type of variables do we have?
-```{r}
+
 class (survey)
 mode(survey) 
 typeof(survey)
 str(survey)
-```
-
 
 # Attach a package needed to use the ggplot function
 
