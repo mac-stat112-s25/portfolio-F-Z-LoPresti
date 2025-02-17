@@ -3,16 +3,6 @@ title: "Spatial Viz"
 ---
 
 Use this file for practice with the **spatial viz** in-class activity.  Refer to the class website for details.
----
-title: "Spatial Viz"
-number-sections: true
-execute: 
-  warning: false
-fig-env: 'figure'
-fig-pos: 'h'
-fig-align: center
-code-fold: false
----
 
 -   Plot data points on top of a map using `ggplot()`.
 -   Create choropleth maps using `geom_map()`.
@@ -179,8 +169,6 @@ ggplot(energy, aes(y = therms, x = hdd, color = renovated)) +
 These spatial maps can be **static** or **dynamic/interactive**.
 
 ## Exercises
-
-{{< include activity-instructions.qmd >}}
 
 ### Preview
 
@@ -380,7 +368,7 @@ But what *don't* you like about this plot?
 **The plot doesn't give me relative context, and the dots are too small for me to really see any overlap.**
 
 ```{r}
-ggplot(starbucks, aes(x = Longitude, y2 = Latitude)) +
+ggplot(starbucks, aes(x = Longitude, y = Latitude)) +
   geom_point(alpha = 0.2, size = 0.2) 
 ```
 
@@ -781,6 +769,31 @@ elections_by_counties <- elections_by_counties |>
 
 #### Part b
 
+```{r}
+# Don't worry about the code!
+
+elections_by_state <- elections_by_state |> 
+  filter(state_abbr != "DC") |> 
+  select(state_name, state_abbr, repub_pct_20) |> 
+  mutate(repub_20_categories = 
+           cut(repub_pct_20, 
+               breaks = seq(30, 70, by = 5), 
+               labels = c("30-34", "35-39", "40-44", "45-49",
+                          "50-54", "55-59", "60-64", "65-70"), 
+               include.lowest = TRUE))
+
+elections_by_counties <- elections_by_counties |> 
+  select(state_name, state_abbr, county_name, county_fips,
+          repub_pct_20, median_age, median_rent) |> 
+  mutate(repub_20_categories = 
+           cut(repub_pct_20, 
+               breaks = seq(0, 100, by = 10),
+               labels = c("0-9", "10-19", "20-29", "30-39", "40-49",
+                          "50-59", "60-69", "70-79", "80-89", "90-100"),
+               include.lowest = TRUE))
+```
+
+
 *Now* map Republican support by county.
 Let's go straight to the discretized `repub_20_categories` variable, and a good color scale.
 
@@ -799,6 +812,12 @@ ggplot(elections_by_counties, aes(map_id = county_fips, fill = repub_20_categori
 Construct county-level maps of `median_rent` and `median_age`.
 
 ```{r}
+ggplot(elections_by_counties, aes(median_age))+
+geom_histogram()
+```
+
+
+```{r}
 # Map it
 # Note where the dataset, elections_by_state, is used. It is being used in the first unit of the ggplot().
 # Note where the background map, states_map, is used. Background map is being used in geom_map.
@@ -808,9 +827,7 @@ elections_by_counties_median_age <- elections_by_counties |>
           repub_pct_20, median_age, median_rent) |> 
   mutate(median_age_categories = 
            cut(median_age, 
-               breaks = seq(25, 50, by = 3),
-               labels = c("0-9", "10-19", "20-29", "30-39", "40-49",
-                          "50-59", "60-69", "70-79", "80-89", "90-100"),
+               breaks = seq(20, 80, by = 10),
                include.lowest = TRUE))
 
 ggplot(elections_by_counties_median_age, aes(map_id = county_fips, fill = median_age_categories)) +
@@ -820,6 +837,7 @@ ggplot(elections_by_counties_median_age, aes(map_id = county_fips, fill = median
   theme_map() +
   theme(legend.position = "right") + 
   coord_equal()
+
 ```
 
 

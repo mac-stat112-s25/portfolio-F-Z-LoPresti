@@ -33,22 +33,23 @@ Replace A, B, C, and D in the code below to:
 ```{r}
 ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) + 
   geom_point() + 
-  labs(x = "A", y = "B", title = "C", color = "D")  
+  labs(x = "Temperature at 9 am (C)", y = "Temperature at 3 pm (C)", title = "Morning vs Afternoon Temperatures", color = "Location")  
 ```
 
-#### Part b {.unnumbered}
+#### Part b 
 
 When we're including our plot in an article, paper, book, or other similar outlet, we should (and are expected to) provide a more descriptive figure caption. Typically, this is *instead* of a title and is more descriptive of what exactly is being plotted.
 
 -   Add a figure caption in the top of the chunk.
 -   Include your x-axis, y-axis, and legend labels from Part a.
--   Render your Rmd and check out how the figure caption appears.
+-   Render your qmd and check out how the figure caption appears.
+
 ```{r}
-#| fig-cap: "???"
+#| fig-cap: "A scatterplot depicting the relationship between morning and afternoon temperatures, varied by three separate locations"
 
 ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) + 
   geom_point() + 
-  labs(x = "???", y = "???", color = "???")  
+  labs(x = "Temperature at 9 am (C)", y = "Temperature at 3 pm (C)", color = "Location")  
 ```
 
 ```{r}
