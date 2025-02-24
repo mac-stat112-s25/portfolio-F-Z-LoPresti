@@ -1,0 +1,31 @@
+---
+title: "Effective Viz"
+---
+
+Use this file to generate a professional looking **univariate** visualization. The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
+
+```{r}
+# Load tidyverse package for plotting and wrangling
+library(tidyverse)
+
+# Import the data
+weather <- read.csv("https://mac-stat.github.io/data/weather_3_locations.csv") |> 
+  mutate(date = as.Date(date))
+```
+
+
+```{r}
+#Plot with accessibility features: alternative captions via #| fig-___ and color scale that is okay for color blind people via scale_color_viridis_c (c is for continuous, d is for discrete).
+
+#| fig-cap: "Density plots of Temperatures in 3 Australian locations."
+#| fig-alt: "Density plots of Temperatures in 3 Australian locations."
+
+ggplot(weather, aes(y = temp3pm, x = temp9am, color = maxtemp)) + 
+  geom_point(alpha = 0.5) + 
+  labs(x = "Morning Temperature (F)",
+       y = "Afternoon Temperature (F)", 
+       color = "Maximum Temperature (F)") + 
+  scale_color_viridis_c()+
+  theme_minimal()
+```
+

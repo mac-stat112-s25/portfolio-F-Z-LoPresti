@@ -18,8 +18,6 @@ hikes <- read.csv("https://mac-stat.github.io/data/high_peaks.csv")
 Let's dig into the `hikes` data, starting with the `elevation` and difficulty `ratings` of the hikes:
 
 ```{r}
-#| eval: true
-
 head(hikes)
 ```
 
@@ -32,9 +30,6 @@ We would like to create a layer that shows how the elevation changes at each pea
 In order to use `ggplot` tools, we have to first *load* the `tidyverse` package in which they live. We've *installed* the package but we need to tell R when we want to *use* it. Run the chunk below to load the library. You'll need to do this within any .qmd file that uses `ggplot()`.
 
 ```{r}
-#| eval: true
-#| message: false
-
 # Load the package
 library(tidyverse)
 ```
