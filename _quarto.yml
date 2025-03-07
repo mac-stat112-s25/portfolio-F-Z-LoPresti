@@ -27,9 +27,13 @@ book:
       chapters: 
       - bw/bw-uni.qmd
       - bw/bw-bi.qmd
+      - bw/bw-multi.qmd
+      - bw/bw-effective.qmd
       - bw/bw-tri.qmd
       - bw/bw-quad.qmd
       - bw/bw-spatial.qmd
+      - bw/bw-exam1.qmd
+     
 
     - part: "In-class Activities"
       chapters: 
@@ -38,6 +42,14 @@ book:
       - ica/ica-bi.qmd
       - ica/ica-multi.qmd
       - ica/ica-spatial.qmd
+      - ica/ica-effective.qmd
+      - ica/ica-dates.qmd
+      - ica/ica-wrangling.qmd
+      - ica/ica-joining.qmd
+      
+    - part: "Summary"
+      chapters: 
+        - summary1.jpg
 
 format:
   html:

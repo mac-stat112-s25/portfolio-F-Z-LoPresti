@@ -1,0 +1,46 @@
+---
+title: "Exam 1"
+number-sections: true
+execute: 
+  warning: false
+fig-env: 'figure'
+fig-pos: 'h'
+fig-align: center
+code-fold: false
+---
+
+```{r}
+#Load packages
+library(tidytuesdayR)
+library(tidyverse)
+```
+
+```{r}
+#Get data
+tuesdata <- tt_load('2020-02-18')
+fc <- tuesdata$food_consumption
+```
+```{r}
+#Understanding data
+str(tuesdata) #checks the structure of the data
+
+head(tuesdata)
+```
+
+```{r}
+#Answering the grand question: What does the consumptionof each food category in each country look like? While also taking into account
+
+#| fig-height: 100
+#| fig- width: 50
+
+#| fig-cap: A tiled visualization of the consumption of certain food groups by country. 
+#| fig-alt: A tiled visualization of the consumption of certain food groups by country. 
+
+ggplot(fc, aes(x = food_category, y = country, fill = consumption)) +  
+  geom_tile() +
+  labs (x = "Categories of Food", y = "Country", fill = "Rate of Consumption")+
+  theme_minimal ()+
+  scale_fill_viridis_c()
+
+```
+

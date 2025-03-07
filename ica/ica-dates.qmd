@@ -178,8 +178,6 @@ penguins |>
 
 ## Exercises Part 1: Same Verbs, New Tricks
 
-{{< include activity-instructions.qmd >}}
-
 ### Exercise 1: More Filtering {.unnumbered}
 
 Recall the "logical comparison operators" we can use to `filter()` our data:
@@ -196,26 +194,20 @@ Recall the "logical comparison operators" we can use to `filter()` our data:
 
 #### Part a {.unnumbered}
 
-::: {.callout-tip title="Commenting/Uncommenting Code"}
-
-To comment/uncomment several lines of code at once, highlight them then click <kbd>ctrl/cmd</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>.
-
-:::
-
 ```{r}
 # Create a dataset with just Adelie and Chinstrap using %in%
 # Pipe this into `count(species)` to confirm that you only have these 2 species
-# ___ |> 
-#   filter(___) |> 
-#   count(species)
+penguins |>
+  filter(species %in% c("Adelie", "Chinstrap")) |>
+  count(species)
 ```
 
 ```{r}
 # Create a dataset with just Adelie and Chinstrap using !=
 # Pipe this into `count(species)` to confirm that you only have these 2 species
-# ___ |> 
-#   filter(___) |> 
-#   count(species)
+penguins |>
+  filter(species != "Gentoo") |>
+  count(species)
 ```
 
 #### Part b {.unnumbered}
@@ -226,11 +218,8 @@ Notice that some of our penguins have missing (`NA`) data on some values:
 head(penguins)
 ```
 
-::: {.callout-tip title="Handeling `NA` Values"}
-
 There are many ways to handle missing data. The right approach depends upon your research goals. A general rule is: Only get rid of observations with missing data if they're missing data on variables you *need* for the specific task at hand!
 
-:::
 
 **Example 1**
 
@@ -281,10 +270,7 @@ nrow(penguins)
 
 Explain why we should only use `na.omit()` in extreme circumstances.
 
-\
-\
-\
-\
+Otherwise we are getting rid of very valuable data!
 
 ### Exercise 2: More Selecting {.unnumbered}
 
@@ -302,32 +288,28 @@ names(penguins)
 
 ```{r}
 # Use a shortcut to keep everything but the year and island variables
-
-
+penguins |> 
+  select(-year, -island)
 ```
 
 ```{r}
 # Use a shortcut to keep only species and the penguin characteristics measured in mm
-
-
+penguins |> 
+  select (species, ends_with("mm"))
 ```
 
 ```{r}
 # Use a shortcut to keep only species and bill-related measurements
-
+penguins |>
+  select (species, starts_with("bill"))
 
 ```
 
 ```{r}
 # Use a shortcut to keep only species and the length-related characteristics
-
-
+penguins |>
+  select (species, contains("length"))
 ```
-
-\
-\
-\
-\
 
 ### Exercise 3: Arranging, Counting, & Grouping by Multiple Variables {.unnumbered}
 
@@ -337,27 +319,23 @@ We've done examples where we need to `filter()` by more than one variable, or `s
 # Change this code to sort the penguins by species, and then island name
 # NOTE: The first row should be an Adelie penguin living on Biscoe island
 penguins |> 
-  arrange(species)
+  arrange(species, island)
 ```
 
 ```{r}
 # Change this code to count the number of male/female penguins observed for each species
 penguins |> 
-  count(species)
+  count(species, sex)
 ```
 
 ```{r}
 # Change this code to calculate the average body mass by species and sex
 penguins |> 
-  group_by(species) |> 
+  group_by(species, sex) |> 
   summarize(mean = mean(body_mass_g, na.rm = TRUE))
 
 ```
 
-\
-\
-\
-\
 
 ### Exercise 4: Dates {.unnumbered}
 
@@ -377,42 +355,39 @@ class(today)
 The `lubridate` package inside `tidyverse` contains functions that can extract various information from dates. Let's learn about some of the most common functions by applying them to `today`. For each, make a comment on what the function does
 
 ```{r}
+#Finds the year of today
 year(today)
 ```
 
 ```{r}
 # What do these lines produce / what's their difference?
-month(today)
-month(today, label = TRUE)
+month(today) # Gives me the numerical value of the month of today
+month(today, label = TRUE) # Gives me the abbreviation name of the month
 ```
 
 ```{r}
 # What does this number mean?
 week(today)
+# It is the ninth week of the year.
 ```
 
 ```{r}
 # What do these lines produce / what's their difference?
-mday(today)
-yday(today)  # This is often called the "Julian day"
+mday(today) # The day of the month
+yday(today)  # This is often called the "Julian day", the day of the year
 ```
 
 ```{r}
 # What do these lines produce / what's their difference?
-wday(today)
-wday(today, label = TRUE)
+wday(today) # fourth day of the week 
+wday(today, label = TRUE) #name of the day of the week
 ```
 
 ```{r}
 # What do the results of these 2 lines tell us?
-today >= ymd("2024-02-14")
-today < ymd("2024-02-14")
+today >= ymd("2024-02-14") # Tells us that today is later that or is on 2/14 
+today < ymd("2024-02-14") # Tells us that today is not earlier than 2/14
 ```
-
-\
-\
-\
-\
 
 ## Exercises Part 2: Application
 
@@ -430,35 +405,40 @@ head(Birthdays)
 -   Build your code line by line. It's important to understand what's being piped into each function!
 
 
-
-
-
-### Exercise 5: Warming up {.unnumbered}
+### Exercise 5: Warming up
 
 ```{r}
 # How many days of data do we have for each state?
-
+Birthdays |>
+  count(state, day)
 
 # How many total births were there in this time period?
-
-
+Birthdays |> 
+  summarize(total_births = sum(births))
+  
 # How many total births were there per state in this time period, sorted from low to high?
-
+Birthdays |> 
+  group_by (state) |>
+  summarize (total_births_state = sum(births)) |> 
+  arrange (total_births_state)
 
 ```
-
-
 
 ### Exercise 6: Homework Reprise {.unnumbered}
 
 Create a new dataset named `daily_births` that includes the total number of births per day (across all states) and the corresponding day of the week, eg, Mon. NOTE: Name the column with total births so that it's easier to wrangle and plot.
 
 ```{r}
+daily_births <- Birthdays |> 
+  group_by(date, wday)|>
+  summarize (total_births = sum (births), .groups = "drop")
 ```
 
 Using this data, construct a plot of `births` over time, indicating the day of week.
 
 ```{r}
+ggplot(daily_births, aes(x = date, y = total_births, color = wday)) + 
+  geom_point()
 ```
 
 
@@ -479,6 +459,10 @@ penguins |>
 Calculate the total number of births in each month and year, eg, Jan 1969, Feb 1969, .... Label month by names not numbers, eg, Jan not 1. Then, plot the births by month and comment on what you learn.
 
 ```{r}
+Birthdays |>
+  group_by(month, year)|>
+  summarize (total_births = (sum))
+  
 ```
 
 #### Part b {.unnumbered}
@@ -509,243 +493,3 @@ Create a dataset with only births in Massachusetts (MA) in 1979 and sort the day
 #### Part b {.unnumbered}
 
 Make a table showing the five states with the most births between September 9, 1979 and September 12, 1979, including the 9th and 12th. Arrange the table in descending order of births.
-
-
-## Solutions
-
-<details>
-
-<summary>Click for Solutions</summary>
-
-### Example 1: Single Verb {.unnumbered}
-
-```{r}
-ggplot(penguins, aes(y = body_mass_g, x = bill_length_mm, color = species)) + 
-  geom_point() + 
-  facet_wrap(~ sex)
-
-```
-
-\
-\
-\
-\
-
-
-
-```{r}
-# Get data on only Adelie penguins that weigh more than 4700g
-penguins |> 
-  filter(species == "Adelie", body_mass_g > 4700)
-
-# Get data on penguin body mass only
-# Show just the first 6 rows
-penguins |> 
-  select(body_mass_g) |> 
-  head()
-
-# Sort the penguins from smallest to largest body mass
-# Show just the first 6 rows
-penguins |> 
-  arrange(body_mass_g) |> 
-  head()
-
-# Calculate the average body mass across all penguins
-# Note: na.rm = TRUE removes the NAs from the calculation
-penguins |> 
-  summarize(mean = mean(body_mass_g, na.rm = TRUE))
-
-# Calculate the average body mass by species
-penguins |> 
-  group_by(species) |> 
-  summarize(mean = mean(body_mass_g, na.rm = TRUE))
-
-# Create a new column that records body mass in kilograms, not grams
-# NOTE: there are 1000 g in 1 kg
-# Show just the first 6 rows
-penguins |> 
-  mutate(body_mass_kg = body_mass_g/1000) |> 
-  head()
-
-```
-
-\
-\
-\
-\
-
-
-
-```{r}
-ggplot(penguins, aes(x = species)) + 
-  geom_bar()
-
-penguins |> 
-  group_by(species) |> 
-  summarize(n())
-
-penguins |> 
-  count(species)
-```
-
-
-
-### Example 2: Multiple Verbs {.unnumbered}
-
-```{r}
-# Sort Gentoo penguins from biggest to smallest with respect to their 
-# bill length in cm (there are 10 mm in a cm)
-penguins |> 
-  filter(species == "Gentoo") |> 
-  mutate(bill_length_cm = bill_length_mm / 10) |> 
-  arrange(desc(bill_length_cm))
-
-# Sort the species from smallest to biggest with respect to their 
-# average bill length in cm
-penguins |> 
-  mutate(bill_length_cm = bill_length_mm / 10) |> 
-  group_by(species) |> 
-  summarize(mean_bill_length = mean(bill_length_cm, na.rm = TRUE)) |> 
-  arrange(desc(mean_bill_length))
-```
-
-
-
-### Example 3: Interpret Code {.unnumbered}
-
-
-
-### Exercise 1: More Filtering {.unnumbered}
-
-#### Part a {.unnumbered}
-
-```{r}
-# Create a dataset with just Adelie and Chinstrap using %in%
-# Pipe this into `count(species)` to confirm that you only have these 2 species
-penguins |>
-  filter(species %in% c("Adelie", "Chinstrap")) |>
-  count(species)
-```
-
-```{r}
-# Create a dataset with just Adelie and Chinstrap using !=
-# Pipe this into `count(species)` to confirm that you only have these 2 species
-penguins |>
-  filter(species != "Gentoo") |>
-  count(species)
-```
-
-#### Part b {.unnumbered}
-
-#### Part c {.unnumbered}
-
-It might get rid of data points even if they have complete information on the variables we need, just because they're missing info on variables we don't need.
-
-
-### Exercise 2: More selecting {.unnumbered}
-
-```{r}
-# First: recall the variable names
-names(penguins)
-```
-
-```{r}
-# Use a shortcut to keep everything but the year and island variables
-penguins |> 
-  select(-year, -island)
-```
-
-```{r}
-# Use a shortcut to keep only species and the penguin characteristics measured in mm
-penguins |> 
-  select(species, ends_with("mm"))
-```
-
-```{r}
-# Use a shortcut to keep only species and bill-related measurements
-penguins |> 
-  select(species, starts_with("bill"))
-```
-
-```{r}
-# Use a shortcut to keep only species and the length-related characteristics
-penguins |> 
-  select(species, contains("length"))
-```
-
-
-### Exercise 3: Arranging, counting, & grouping by multiple variables {.unnumbered}
-
-```{r}
-# Change this code to sort the penguins by species, and then island name
-# NOTE: The first row should be an Adelie penguin living on Biscoe island
-penguins |> 
-  arrange(species, island) |> 
-  head()
-```
-
-```{r}
-# Change this code to count the number of male/female penguins observed for each species
-penguins |> 
-  count(species, sex)
-```
-
-```{r}
-# Change this code to calculate the average body mass by species and sex
-penguins |> 
-  group_by(species, sex) |> 
-  summarize(mean = mean(body_mass_g, na.rm = TRUE))
-
-```
-
-
-### Exercise 4: Dates {.unnumbered}
-
-```{r}
-# Get today's date
-as.Date(today())
-
-# Let's store this as "today" so we can work with it below
-today <- as.Date(today())
-
-# Check out the class of this object
-class(today)
-```
-
-```{r}
-# Records just the 4-digit year
-year(today)
-```
-
-```{r}
-# Today's month, as a number or label
-month(today)
-month(today, label = TRUE)
-```
-
-```{r}
-# This is the week of the year (1-52)
-week(today)
-```
-
-```{r}
-# Day of the month (1-31) and day of the year (1-366)
-mday(today)
-yday(today)  # This is often called the "Julian day"
-```
-
-```{r}
-# Day of the week as a number or label
-wday(today)
-wday(today, label = TRUE)
-```
-
-```{r}
-# today is on or after Feb 14, 2024
-today >= ymd("2024-02-14")
-# today is not before Feb 14, 2024
-today < ymd("2024-02-14")
-```
-
-
-</details>
