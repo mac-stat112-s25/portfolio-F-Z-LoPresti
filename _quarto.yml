@@ -45,7 +45,9 @@ book:
       - ica/ica-effective.qmd
       - ica/ica-dates.qmd
       - ica/ica-wrangling.qmd
+      - ica/ica-reshape.qmd
       - ica/ica-joining.qmd
+      - ica/ica-factors.qmd
       
     - part: "Summary"
       chapters: 

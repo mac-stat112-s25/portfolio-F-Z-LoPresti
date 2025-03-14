@@ -359,20 +359,22 @@ Use the appropriate join for each prompt below. In each case, think before you t
 
 ```{r}
 # 1. We want contact info for people who HAVEN'T voted
-
+contact |> 
+  anti_join(voters, by = c("name" = "id"))
 
 # 2. We want contact info for people who HAVE voted
-
+contact |> 
+  semi_join(voters, by = c("name" = "id"))
 
 # 3. We want any data available on each person
-
+contact |> 
+  full_join(voters, by = c("name" = "id"))
 
 # 4. When possible, we want to add contact info to the voting roster
-
+voters |>
+  left_join(contact, join_by(id == name))
 
 ```
-
-
 
 ### Exercise 3: Bigger datasets {.unnumbered}
 
@@ -411,10 +413,10 @@ Use R code to take a quick glance at the data.
 
 ```{r}
 # How many observations (rows) and variables (columns) are there in the grades data?
-
+dim(grades)
 
 # How many observations (rows) and variables (columns) are there in the courses data?
-
+dim(courses)
 
 ```
 
@@ -444,12 +446,12 @@ courses |>
 For our class size exploration, obtain the *total* enrollments in each `sessionID`, combining any cross-listed sections. Save this as `courses_combined`. NOTE: There's no joining to do here!
 
 ```{r}
-# courses_combined <- courses |> 
-#   ___(sessionID) |> 
-#   ___(enroll = sum(___))
+courses_combined <- courses |>
+  group_by(sessionID) |>
+  summarize(enroll = sum(enroll))
 
 # Check that this has 1695 rows and 2 columns
-# dim(courses_combined)
+dim(courses_combined)
 ```
 
 #### Part b {.unnumbered}
@@ -461,6 +463,8 @@ Let's first examine the question of class size from the *administration*'s viewp
 -   Do you have to do any joining? If so, which dataset will go on the left, i.e. which dataset includes your primary observations of interest? Which join function will you need?
 
 ```{r}
+courses_combined |>
+  summarize(median(enroll))
 ```
 
 #### Part c {.unnumbered}
@@ -472,6 +476,11 @@ But how big are classes from the student perspective? To this end, calculate the
 -   Do you have to do any joining? If so, which dataset will go on the left, i.e. which dataset includes your primary observations of interest? Which join function will you need?
 
 ```{r}
+student_class_size <- grades |>
+  left_join(courses_combined) |> 
+  group_by(sid) |> 
+  summarize(median_class_size = median(enroll))
+  
 ```
 
 #### Part d {.unnumbered}
@@ -479,11 +488,9 @@ But how big are classes from the student perspective? To this end, calculate the
 The median class size varies from student to student. To get a sense for the typical student experience and range in student experiences, construct and discuss a histogram of the median class sizes experienced by the students.
 
 ```{r}
-# ggplot(student_class_size, aes(x = ___)) + 
-#   geom___()
+ggplot(student_class_size, aes(x = median_class_size)) +
+  geom_histogram(color = "blue", fill = "darkblue")
 ```
-
-
 
 ### Exercise 5: Narrowing in on classes {.unnumbered}
 
@@ -492,6 +499,10 @@ The median class size varies from student to student. To get a sense for the typ
 Show data on the students that enrolled in `session1986`. THINK FIRST: Which of the 2 datasets do you need to answer this question? One? Both?
 
 ```{r}
+grades |> 
+  left_join(courses_combined) |>
+  filter (sessionID == "session1986")
+
 ```
 
 #### Part b {.unnumbered}
@@ -506,9 +517,9 @@ dept_E <- courses |>
 What students enrolled in classes in department E? (We just want info on the students, not the classes.)
 
 ```{r}
+grades |>
+  semi_join(dept_E)
 ```
-
-
 
 ### Exercise 6: All the wrangling {.unnumbered}
 
@@ -531,6 +542,11 @@ gpa_conversion
 How many total student enrollments are there in each department? Order from high to low.
 
 ```{r}
+courses |> 
+  group_by(dept) |> 
+  summarise(total_enroll = sum(enroll)) |>
+  arrange(desc(total_enroll))
+  
 ```
 
 #### Part b {.unnumbered}
@@ -538,6 +554,10 @@ How many total student enrollments are there in each department? Order from high
 What's the grade-point average (GPA) for each student?
 
 ```{r}
+grades |> 
+  left_join(gpa_conversion) |> 
+  group_by(sid) |>
+  summarize(gpa = mean(gp, na.rm = TRUE))
 ```
 
 #### Part c {.unnumbered}
@@ -545,6 +565,11 @@ What's the grade-point average (GPA) for each student?
 What's the median GPA across all students?
 
 ```{r}
+grades |> 
+  left_join(gpa_conversion) |> 
+  group_by(sid) |>
+  summarize(gpa = mean(gp, na.rm = TRUE)) |>
+  summarise(median(gpa))
 ```
 
 #### Part d {.unnumbered}
@@ -552,6 +577,16 @@ What's the median GPA across all students?
 What fraction of grades are below B+?
 
 ```{r}
+grades |> 
+  left_join(gpa_conversion) |> 
+  filter (gp < 3.3) |> 
+  summarize (total_below = n()) 
+  
+  grades |>
+  summarize (total_grades = n())
+  
+  grades |> 
+    summarize(fraction_below = 1539/5844)
 ```
 
 #### Part e {.unnumbered}
@@ -559,277 +594,6 @@ What fraction of grades are below B+?
 What's the grade-point average for each instructor? Order from low to high.
 
 ```{r}
-```
-
-#### Part f {.unnumbered}
-
-CHALLENGE: Estimate the grade-point average for each department, and sort from low to high. NOTE: Don't include cross-listed courses. Students in cross-listed courses could be enrolled under either department, and we do not know which department to assign the grade to. HINT: You'll need to do multiple joins.
-
-
-
-### Exercise 7: HOMEWORK PRACTICE {.unnumbered}
-
-This exercise is on Homework 4, thus no solutions are provided. In Homework 4, you'll be working with the `Birthdays` data:
-
-```{r}
-library(mosaic)
-data("Birthdays")
-head(Birthdays)
-```
-
-You'll also be exploring how the number of daily births is (or isn't!) related to holidays. To this end, import data on U.S. federal holidays [here](data/US-Holidays.csv). NOTE: `lubridate::dmy()` converts the character-string date stored in the CSV to a "POSIX" date-number.
-
-```{r}
-holidays <- read.csv("https://mac-stat.github.io/data/US-Holidays.csv") |>
-  mutate(date = as.POSIXct(lubridate::dmy(date)))
-```
-
-#### Part a {.unnumbered}
-
-Create a new dataset, `daily_births_1980`, which:
-
--   keeps only `daily_births` related to **1980**
--   adds a variable called `is_holiday` which is `TRUE` when the day is a holiday, and `FALSE` otherwise. NOTE: `!is.na(x)` is `TRUE` if column `x` is *not* NA, and `FALSE` if it is NA.
-
-Print out the first 6 rows and confirm that your dataset has 366 rows (1 per day in 1980) and 7 columns. HINT: You'll need to combine 2 different datasets.
-
-```{r}
-# Define daily_births_1980
-
-
-# Check out the first 6 rows
-
-
-# Confirm that daily_births_1980 has 366 rows and 7 columns
-
-
-```
-
-#### Part b {.unnumbered}
-
-Plot the total number of babies born (y-axis) per day (x-axis) in 1980. Color each date according to its day of the week, and `shape` each date according to whether or not it's a holiday. (This is a modified version of 3c!)
-
-```{r}
-```
-
-#### Part c {.unnumbered}
-
-Discuss your observations. For example: To what degree does the theory that there tend to be fewer births on holidays hold up? What holidays stand out the most?
-
-#### Part d (OPTIONAL) {.unnumbered}
-
-Some holidays stand out more than others. It would be helpful to label them. Use `geom_text` to add labels to each of the holidays. NOTE: You can set the orientation of a label with the `angle` argument; e.g., `geom_text(angle = 40, ...)`.
-
-
-
-## Solutions
-
-<details>
-
-<summary>Click for Solutions</summary>
-
-### Example 1 {-}
-
-a.  class
-b.  a student that took ANTH 101
-c.  data on ART 101
-
-
-### Example 2 {-}
-
--   What did this do? Linked course info to all students in `students_1`
--   Which observations from `students_1` (the *left* table) were retained? All of them.
--   Which observations from `enrollments_1` (the *right* table) were retained? Only STAT and GEOL, those that matched the students.
--   What, if anything, would change if we reversed the order of the data tables? Think about it, then try. We retain the courses, not students.
-
-```{r}
-enrollments_1 |> 
-  left_join(students_1)
-```
-
-
-### Example 3 {-}
-
--   Which observations from `students_1` (the *left* table) were retained? A and B, only those with enrollment info.
-
--   Which observations from `enrollments_1` (the *right* table) were retained? STAT and GEOL, only those with studen info.
-
--   What, if anything, would change if we reversed the order of the data tables? Think about it, then try. Same info, different column order.
-
-```{r}
-enrollments_1 |> 
-    inner_join(students_1)
-```
-
-### Example 4 {-}
-
--   Which observations from `students_1` (the *left* table) were retained? All
--   Which observations from `enrollments_1` (the *right* table) were retained? All
--   What, if anything, would change if we reversed the order of the data tables? Think about it, then try. Same data, different order.
-
-```{r}
-enrollments_1 |> 
-    full_join(students_1)
-
-```
-
-### Example 5 {-}
-
--   Which observations from `students_1` (the *left* table) were retained? Only those with enrollment info.
--   Which observations from `enrollments_1` (the *right* table) were retained? None.
--   What, if anything, would change if we reversed the order of the data tables? Think about it, then try. Same data, different order.
-
-```{r}
-enrollments_1 |> 
-  semi_join(students_1)
-```
-
-### Example 6 {-}
-
--   Which observations from `students_1` (the *left* table) were retained? Only C, the one *without* enrollment info.
--   Which observations from `enrollments_1` (the *right* table) were retained? None.
--   What, if anything, would change if we reversed the order of the data tables? Think about it, then try. Retain only ART 101, the course with no student info.
-
-```{r}
-enrollments_1 |> 
-  anti_join(students_1)
-```
-
-
-### Exercise 2: More small practice {.unnumbered}
-
-```{r}
-# 1. We want contact info for people who HAVEN'T voted
-contact |> 
-  anti_join(voters, by = c("name" = "id"))
-
-# 2. We want contact info for people who HAVE voted
-contact |> 
-  semi_join(voters, by = c("name" = "id"))
-
-# 3. We want any data available on each person
-contact |> 
-  full_join(voters, by = c("name" = "id"))
-voters |> 
-  full_join(contact, by = c("id" = "name"))
-
-# 4. We want to add contact info, when possible, to the voting roster
-voters |> 
-  left_join(contact, by = c("id" = "name"))
-```
-
-
-### Exercise 3: Bigger datasets {.unnumbered}
-
-```{r}
-# How many observations (rows) and variables (columns) are there in the grades data?
-dim(grades)
-
-# How many observations (rows) and variables (columns) are there in the courses data?
-dim(courses)
-
-```
-
-
-### Exercise 4: Class size {.unnumbered}
-
-#### Part a {.unnumbered}
-
-```{r}
-courses_combined <- courses |>
-  group_by(sessionID) |>
-  summarize(enroll = sum(enroll))
-
-# Check that this has 1695 rows and 2 columns
-dim(courses_combined)
-```
-
-#### Part b {.unnumbered}
-
-```{r eval = FALSE}
-courses_combined |> 
-  summarize(median(enroll))
-```
-
-#### Part c {.unnumbered}
-
-```{r eval = FALSE}
-student_class_size <- grades |> 
-  left_join(courses_combined) |> 
-  group_by(sid) |> 
-  summarize(med_class = median(enroll))
-
-head(student_class_size)
-```
-
-#### Part d {.unnumbered}
-
-```{r eval = FALSE}
-ggplot(student_class_size, aes(x = med_class)) +
-  geom_histogram(color = "white")
-```
-
-
-### Exercise 5: Narrowing in on classes {.unnumbered}
-
-#### Part a {.unnumbered}
-
-```{r eval = FALSE}
-grades |> 
-  filter(sessionID == "session1986")
-```
-
-#### Part b {.unnumbered}
-
-```{r eval = FALSE}
-grades |> 
-  semi_join(dept_E)
-```
-
-
-### Exercise 6: All the wrangling {.unnumbered}
-
-#### Part a {.unnumbered}
-
-```{r eval = FALSE}
-courses |> 
-  group_by(dept) |> 
-  summarize(total = sum(enroll)) |> 
-  arrange(desc(total))
-```
-
-#### Part b {.unnumbered}
-
-```{r eval = FALSE}
-grades |> 
-  left_join(gpa_conversion) |> 
-  group_by(sid) |> 
-  summarize(mean(gp, na.rm = TRUE))
-```
-
-#### Part c {.unnumbered}
-
-```{r eval = FALSE}
-grades |> 
-  left_join(gpa_conversion) |> 
-  group_by(sid) |> 
-  summarize(gpa = mean(gp, na.rm = TRUE)) |> 
-  summarize(median(gpa))
-```
-
-#### Part d {.unnumbered}
-
-```{r eval = FALSE}
-# There are lots of approaches here!
-grades |> 
-  left_join(gpa_conversion) |> 
-  mutate(below_b_plus = (gp < 3.3)) |> 
-  summarize(mean(below_b_plus, na.rm = TRUE))
-```
-
-#### Part e {.unnumbered}
-
-```{r eval = FALSE}
 grades |> 
   left_join(gpa_conversion) |> 
   left_join(courses) |> 
@@ -840,18 +604,5 @@ grades |>
 
 #### Part f {.unnumbered}
 
-```{r eval = FALSE}
-cross_listed <- courses |> 
-  count(sessionID) |> 
-  filter(n > 1)
+CHALLENGE: Estimate the grade-point average for each department, and sort from low to high. NOTE: Don't include cross-listed courses. Students in cross-listed courses could be enrolled under either department, and we do not know which department to assign the grade to. HINT: You'll need to do multiple joins.
 
-grades |> 
-  anti_join(cross_listed) |> 
-  inner_join(courses) |> 
-  left_join(gpa_conversion) |> 
-  group_by(dept) |> 
-  summarize(gpa = mean(gp, na.rm = TRUE)) |> 
-  arrange(gpa)
-```
-
-</details>
