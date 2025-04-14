@@ -1,0 +1,63 @@
+---
+title: "Solo Project"
+execute: 
+  echo: false
+  warning: false
+  error: false
+---
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+```
+
+
+```{r}
+# Download csv file about CA Wildfire Data
+ca_wildfire <- read_csv("~/Desktop/portfolio-F-Z-LoPresti/data/Ca_Wildfire.csv")
+```
+
+```{r}
+#Inspect data 
+head(ca_wildfire)
+```
+```{r}
+#Get ready ton install simple feature layer!
+library(sf)
+```
+
+```{r}
+# Download boundaries for CA counties
+ca_counties <- read_sf("~/Desktop/portfolio-F-Z-LoPresti/data/ca_counties")
+```
+
+```{r}
+# Create a combined data set that shows the CA wildfire dataset with the geometry 
+wildfire_mapped <- ca_wildfire |>
+  mutate(NAMELSAD = Location) |>
+  left_join(ca_counties)
+```
+
+```{r}
+# Map CA counties
+ggplot(ca_counties) +
+  geom_sf()
+```
+
+```{r}
+#Map wildfire mortality by county
+ggplot() + 
+  geom_sf(data = ca_counties, fill = "white", color = "black") + 
+  geom_sf(data = wildfire_mapped, aes(geometry = geometry, fill = Fatalities)) +
+  scale_color_viridis_c() +  
+  theme_minimal() +
+  labs(title = "Wildfire Fatalities by County in California")
+```
+
+
+
+
+
+
+
+

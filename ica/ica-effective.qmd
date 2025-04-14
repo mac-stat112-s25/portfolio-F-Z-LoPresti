@@ -1,5 +1,6 @@
 ---
 title: "Effective Viz"
+---
 ## Exercises
 
 ### Exercise 1: Professionalism {.unnumbered}

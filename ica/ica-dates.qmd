@@ -461,8 +461,7 @@ Calculate the total number of births in each month and year, eg, Jan 1969, Feb 1
 ```{r}
 Birthdays |>
   group_by(month, year)|>
-  summarize (total_births = (sum))
-  
+  summarize (total_births = sum(month))
 ```
 
 #### Part b {.unnumbered}

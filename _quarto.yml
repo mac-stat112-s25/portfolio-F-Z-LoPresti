@@ -27,12 +27,12 @@ book:
       chapters: 
       - bw/bw-uni.qmd
       - bw/bw-bi.qmd
-      - bw/bw-multi.qmd
-      - bw/bw-effective.qmd
       - bw/bw-tri.qmd
       - bw/bw-quad.qmd
       - bw/bw-spatial.qmd
       - bw/bw-exam1.qmd
+      - bw/bw-exam2.qmd
+      - bw/bw-SoloProject.qmd
      
 
     - part: "In-class Activities"
@@ -52,7 +52,8 @@ book:
       
     - part: "Summary"
       chapters: 
-        - summary1.jpg
+        - summary/Summary1.jpg
+        - summary/Summary2.jpg
 
 format:
   html:
