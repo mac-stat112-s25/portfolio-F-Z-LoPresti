@@ -1,0 +1,12 @@
+---
+title: "summary_pg"
+
+execute: 
+  echo: false
+  warning: false
+  error: false
+---
+
+<Img src="Visualization.png">
+
+<Img src="Wrangling.png">

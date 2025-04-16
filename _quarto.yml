@@ -52,8 +52,7 @@ book:
       
     - part: "Summary"
       chapters: 
-        - summary/Summary1.jpg
-        - summary/Summary2.jpg
+        - summary/summary_pg.qmd
 
 format:
   html:
