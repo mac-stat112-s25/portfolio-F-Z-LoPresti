@@ -34,7 +34,10 @@ book:
       - bw/bw-exam2.qmd
       - bw/bw-SoloProject.qmd
      
-
+    - part: "Summary"
+      chapters: 
+      - summary/summary_pg.qmd
+        
     - part: "In-class Activities"
       chapters: 
       - ica/quarto-demo.qmd
@@ -49,10 +52,6 @@ book:
       - ica/ica-joining.qmd
       - ica/ica-factors.qmd
       - ica/ica-dataimport.qmd
-      
-    - part: "Summary"
-      chapters: 
-        - summary/summary_pg.qmd
 
 format:
   html:
